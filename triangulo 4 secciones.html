@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dibujar un triángulo equilátero subdividido</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+
+    <script>
+        window.addEventListener('load', function() {
+            var canvas = document.getElementById('myCanvas');
+            var context = canvas.getContext('2d');
+
+            // Función para dibujar un triángulo equilátero
+            function drawEquilateralTriangle(x, y, size) {
+                context.beginPath();
+                context.moveTo(x, y);
+                context.lineTo(x + size, y);
+                context.lineTo(x + size / 2, y - (Math.sqrt(3) / 2) * size);
+                context.closePath();
+                context.stroke();
+            }
+
+            // Función para dibujar líneas internas que subdividen el triángulo inicial
+            function drawSubdividingLines(x, y, size) {
+                var height = (Math.sqrt(3) / 2) * size;
+                var midX = x + size / 2;
+                var midY = y - height / 2;
+
+                // Dibujar líneas que dividen el triángulo inicial en 4 triángulos equiláteros
+                context.beginPath();
+                context.moveTo(midX, midY);
+                context.lineTo(x + size / 4, y - height / 2);
+                context.moveTo(midX, midY);
+                context.lineTo(x + size / 4 * 3, y - height / 2);
+                context.moveTo(x + size / 4, y - height / 2);
+                context.lineTo(x + size / 2, y);
+                context.moveTo(x + size / 2, y);
+                context.lineTo(x + size / 4 * 3, y - height / 2);
+                context.closePath();
+                context.stroke();
+            }
+
+            // Dibujar el triángulo equilátero inicial en el canvas
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var triangleSize = 400;
+            drawEquilateralTriangle(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, triangleSize);
+
+            // Dibujar líneas internas que subdividen el triángulo inicial
+            drawSubdividingLines(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, triangleSize);
+        });
+    </script>
+</body>
+</html>

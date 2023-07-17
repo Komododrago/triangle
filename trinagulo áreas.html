@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dibujar un triángulo equilátero y líneas desde los vértices hasta un punto seleccionado</title>
+  <style>
+    #canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="400" height="400"></canvas>
+  <button id="btn">Seleccionar punto aleatorio</button>
+  
+  <div id="areas">
+    <h3>Áreas de los triángulos:</h3>
+    <p id="areaC"></p>
+    <p id="areaA"></p>
+    <p id="areaB"></p>
+  </div>
+
+  <div id="contadores">
+    <h3>Contadores de porcentaje:</h3>
+    <p>Triángulo C: <span id="contadorC">0</span>%</p>
+    <p>Triángulo A: <span id="contadorA">0</span>%</p>
+    <p>Triángulo B: <span id="contadorB">0</span>%</p>
+    <h3>Contador de veces:</h3>
+    <p>Veces presionado el botón: <span id="contadorVeces">0</span></p>
+    <h3>Suma de los contadores:</h3>
+    <p>Suma de los contadores A, B y C: <span id="contadorSuma">0</span>%</p>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var canvas = document.getElementById("canvas");
+      var context = canvas.getContext("2d");
+
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+      var sideLength = 200;
+
+      var x1 = centerX;
+      var y1 = centerY - Math.sqrt(3) * sideLength / 3;
+      var x2 = centerX - sideLength / 2;
+      var y2 = centerY + Math.sqrt(3) * sideLength / 6;
+      var x3 = centerX + sideLength / 2;
+      var y3 = y2;
+
+      context.beginPath();
+      context.moveTo(x1, y1);
+      context.lineTo(x2, y2);
+      context.lineTo(x3, y3);
+      context.closePath();
+
+      context.lineWidth = 2;
+      context.strokeStyle = "black";
+      context.fillStyle = "yellow";
+
+      context.fill();
+      context.stroke();
+
+      // Etiquetas de los vértices
+      context.font = "14px Arial";
+      context.fillStyle = "black";
+      context.fillText("A", x1, y1 - 10);
+      context.fillText("B", x2 - 15, y2 + 20);
+      context.fillText("C", x3 + 10, y3 + 20);
+
+      var button = document.getElementById("btn");
+      var contadorC = 0;
+      var contadorA = 0;
+      var contadorB = 0;
+      var contadorVeces = 0;
+      var contadorSuma = 0;
+
+      button.addEventListener("click", function() {
+        // Generar punto aleatorio dentro del triángulo
+        var randomPoint = generateRandomPoint();
+
+        // Dibujar punto seleccionado
+        context.beginPath();
+        context.arc(randomPoint.x, randomPoint.y, 5, 0, 2 * Math.PI);
+        context.fillStyle = "red";
+        context.fill();
+        context.stroke();
+
+        // Dibujar líneas desde los vértices hasta el punto seleccionado
+        context.beginPath();
+        context.moveTo(x1, y1);
+        context.lineTo(randomPoint.x, randomPoint.y);
+        context.moveTo(x2, y2);
+        context.lineTo(randomPoint.x, randomPoint.y);
+        context.moveTo(x3, y3);
+        context.lineTo(randomPoint.x, randomPoint.y);
+        context.strokeStyle = "blue";
+        context.stroke();
+
+        // Calcular el área total del triángulo
+        var totalArea = calculateTriangleArea(x1, y1, x2, y2, x3, y3);
+
+        // Calcular el área de los tres triángulos
+        var areaC = calculateTriangleArea(x1, y1, x2, y2, randomPoint.x, randomPoint.y);
+        var areaA = calculateTriangleArea(x2, y2, x3, y3, randomPoint.x, randomPoint.y);
+        var areaB = calculateTriangleArea(x3, y3, x1, y1, randomPoint.x, randomPoint.y);
+
+        // Calcular los porcentajes de las áreas
+        var percentC = (areaC / totalArea) * 100;
+        var percentA = (areaA / totalArea) * 100;
+        var percentB = (areaB / totalArea) * 100;
+
+        document.getElementById("areaC").textContent = "Área del triángulo C: " + percentC.toFixed(2) + "% del área total";
+        document.getElementById("areaA").textContent = "Área del triángulo A: " + percentA.toFixed(2) + "% del área total";
+        document.getElementById("areaB").textContent = "Área del triángulo B: " + percentB.toFixed(2) + "% del área total";
+
+        // Actualizar los contadores de porcentaje
+        contadorC += percentC;
+        contadorA += percentA;
+        contadorB += percentB;
+
+        document.getElementById("contadorC").textContent = contadorC.toFixed(2);
+        document.getElementById("contadorA").textContent = contadorA.toFixed(2);
+        document.getElementById("contadorB").textContent = contadorB.toFixed(2);
+
+        // Actualizar el contador de veces
+        contadorVeces++;
+        document.getElementById("contadorVeces").textContent = contadorVeces;
+
+        // Actualizar la suma de los contadores
+        contadorSuma = contadorA + contadorB + contadorC;
+        document.getElementById("contadorSuma").textContent = contadorSuma.toFixed(2);
+      });
+
+      function generateRandomPoint() {
+        var u = Math.random();
+        var v = Math.random();
+
+        var point = {};
+
+        if (u + v <= 1) {
+          point.x = x1 + u * (x2 - x1) + v * (x3 - x1);
+          point.y = y1 + u * (y2 - y1) + v * (y3 - y1);
+        } else {
+          point.x = x2 + (1 - u) * (x3 - x2) + (1 - v) * (x1 - x2);
+          point.y = y2 + (1 - u) * (y3 - y2) + (1 - v) * (y1 - y2);
+        }
+
+        return point;
+      }
+
+      function calculateTriangleArea(x1, y1, x2, y2, x3, y3) {
+        return 0.5 * Math.abs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2));
+      }
+    });
+  </script>
+</body>
+</html>

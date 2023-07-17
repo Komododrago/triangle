@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dibujar un triángulo equilátero con círculos y líneas equidistantes</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+
+    <script>
+        window.onload = function() {
+            var canvas = document.getElementById("myCanvas");
+            var context = canvas.getContext("2d");
+            
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var sideLength = 200;
+            
+            var height = (Math.sqrt(3) / 2) * sideLength;
+            
+            var x1 = centerX;
+            var y1 = centerY - (height / 2);
+            
+            var x2 = centerX - (sideLength / 2);
+            var y2 = centerY + (height / 2);
+            
+            var x3 = centerX + (sideLength / 2);
+            var y3 = centerY + (height / 2);
+            
+            // Dibujar triángulo original
+            drawTriangle(context, x1, y1, x2, y2, x3, y3, "yellow");
+            
+            // Calcular radio del primer círculo
+            var radius1 = Math.min(sideLength / 2, height / 3);
+            
+            // Calcular centro del primer círculo
+            var circleCenterX1 = (x1 + x2 + x3) / 3;
+            var circleCenterY1 = (y1 + y2 + y3) / 3;
+            
+            // Dibujar primer círculo concéntrico
+            drawCircle(context, circleCenterX1, circleCenterY1, radius1, "red");
+            
+            // Calcular radio del segundo círculo
+            var radius2 = radius1 / 2;
+            
+            // Calcular centro del segundo círculo
+            var circleCenterX2 = circleCenterX1;
+            var circleCenterY2 = circleCenterY1;
+            
+            // Dibujar segundo círculo concéntrico
+            drawCircle(context, circleCenterX2, circleCenterY2, radius2, "blue");
+            
+            // Dibujar líneas equidistantes
+            var numLines = 6;
+            var angleStep = (2 * Math.PI) / numLines;
+            
+            for (var i = 0; i < numLines; i++) {
+                var angle = i * angleStep;
+                
+                var startX = circleCenterX1 + radius1 * Math.cos(angle);
+                var startY = circleCenterY1 + radius1 * Math.sin(angle);
+                
+                var endX = circleCenterX2 + radius2 * Math.cos(angle);
+                var endY = circleCenterY2 + radius2 * Math.sin(angle);
+                
+                drawLine(context, startX, startY, endX, endY, "green");
+            }
+        };
+        
+        function drawTriangle(context, x1, y1, x2, y2, x3, y3, color) {
+            context.beginPath();
+            context.moveTo(x1, y1);
+            context.lineTo(x2, y2);
+            context.lineTo(x3, y3);
+            context.closePath();
+            context.lineWidth = 2;
+            context.strokeStyle = "black";
+            context.fillStyle = color;
+            context.fill();
+            context.stroke();
+        }
+        
+        function drawCircle(context, x, y, radius, color) {
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI);
+            context.fillStyle = color;
+            context.fill();
+            context.stroke();
+        }
+        
+        function drawLine(context, startX, startY, endX, endY, color) {
+            context.beginPath();
+            context.moveTo(startX, startY);
+            context.lineTo(endX, endY);
+            context.lineWidth = 2;
+            context.strokeStyle = color;
+            context.stroke();
+        }
+    </script>
+</body>
+</html>    
