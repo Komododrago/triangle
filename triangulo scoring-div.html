@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dibujar un triángulo equilátero subdividido y líneas desde los vértices hasta un punto seleccionado</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <button id="btn">Seleccionar punto aleatorio</button>
+
+    <div id="areas">
+        <h3>Áreas de los triángulos:</h3>
+        <p id="areaC"></p>
+        <p id="areaA"></p>
+        <p id="areaB"></p>
+    </div>
+
+    <div id="contadores">
+        <h3>Contadores de porcentaje:</h3>
+        <p>Triángulo C: <span id="contadorC">0</span>%</p>
+        <p>Triángulo A: <span id="contadorA">0</span>%</p>
+        <p>Triángulo B: <span id="contadorB">0</span>%</p>
+        <h3>Contador de veces:</h3>
+        <p>Veces presionado el botón: <span id="contadorVeces">0</span></p>
+        <h3>Suma de los contadores:</h3>
+        <p>Suma de los contadores A, B y C: <span id="contadorSuma">0</span>%</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var canvas = document.getElementById("myCanvas");
+            var context = canvas.getContext("2d");
+
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+            var triangleSize = 400;
+
+            // Función para dibujar un triángulo equilátero
+            function drawEquilateralTriangle(x, y, size) {
+                context.beginPath();
+                context.moveTo(x, y);
+                context.lineTo(x + size, y);
+                context.lineTo(x + size / 2, y - (Math.sqrt(3) / 2) * size);
+                context.closePath();
+                context.stroke();
+            }
+
+            // Función para dibujar líneas internas que subdividen el triángulo inicial
+            function drawSubdividingLines(x, y, size) {
+                var height = (Math.sqrt(3) / 2) * size;
+                var midX = x + size / 2;
+                var midY = y - height / 2;
+
+                var points = [
+                    [2*size / 6, 2 * height / 3],
+                    [4*size / 6, 0],
+                    [5*size / 6, height / 3],
+                    [size / 6, height / 3],
+                    [size / 3, 0],
+                    [4*size / 6, 2*height / 3]
+                ];
+
+                // Dibujar líneas que dividen el triángulo inicial en 9 triángulos equiláteros
+                context.beginPath();
+                context.moveTo(x + points[0][0], y - points[0][1]);
+                for (var i = 1; i < points.length; i++) {
+                    context.lineTo(x + points[i][0], y - points[i][1]);
+                }
+                context.closePath();
+                context.stroke();
+            }
+
+            // Función para dibujar un círculo concéntrico
+            function drawConcentricCircle(x, y, size) {
+                var radius = (Math.sqrt(3) / 9) * size;
+                context.beginPath();
+                context.arc(x, y, radius, 0, 2 * Math.PI);
+                context.stroke();
+            }
+
+            // Función para generar un punto aleatorio dentro del triángulo
+            function generateRandomPoint(x1, y1, x2, y2, x3, y3) {
+                var u = Math.random();
+                var v = Math.random();
+
+                var point = {};
+
+                if (u + v <= 1) {
+                    point.x = x1 + u * (x2 - x1) + v * (x3 - x1);
+                    point.y = y1 + u * (y2 - y1) + v * (y3 - y1);
+                } else {
+                    point.x = x2 + (1 - u) * (x3 - x2) + (1 - v) * (x1 - x2);
+                    point.y = y2 + (1 - u) * (y3 - y2) + (1 - v) * (y1 - y2);
+                }
+
+                return point;
+            }
+
+            // Función para calcular el área de un triángulo
+            function calculateTriangleArea(x1, y1, x2, y2, x3, y3) {
+                return Math.abs((x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) / 2);
+            }
+
+            // Dibujar el triángulo equilátero inicial en el canvas
+            drawEquilateralTriangle(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, triangleSize);
+
+            // Dibujar líneas internas que subdividen el triángulo inicial
+            drawSubdividingLines(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, triangleSize);
+
+            // Dibujar un círculo concéntrico
+            var circleCenterX = centerX;
+            var circleCenterY = centerY - (Math.sqrt(3) / 500) * triangleSize;
+            drawConcentricCircle(circleCenterX, circleCenterY, triangleSize);
+
+            var button = document.getElementById("btn");
+            var contadorC = 0;
+            var contadorA = 0;
+            var contadorB = 0;
+            var contadorVeces = 0;
+            var contadorSuma = 0;
+
+            button.addEventListener("click", function() {
+                var randomPoint = generateRandomPoint(centerX, centerY - (Math.sqrt(3) / 6) * triangleSize, centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, centerX + triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize);
+
+                context.beginPath();
+                context.arc(randomPoint.x, randomPoint.y, 5, 0, 2 * Math.PI);
+                context.fillStyle = "red";
+                context.fill();
+                context.stroke();
+
+                context.beginPath();
+                context.moveTo(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize);
+                context.lineTo(randomPoint.x, randomPoint.y);
+                context.moveTo(centerX + triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize);
+                context.lineTo(randomPoint.x, randomPoint.y);
+                context.moveTo(centerX, centerY - (Math.sqrt(3) / 1) * triangleSize / 3);
+                context.lineTo(randomPoint.x, randomPoint.y);
+                context.strokeStyle = "blue";
+                context.stroke();
+
+                var totalArea = calculateTriangleArea(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, centerX + triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, centerX, centerY - (Math.sqrt(3) / 2) * triangleSize / 3);
+                var areaC = calculateTriangleArea(centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, randomPoint.x, randomPoint.y, centerX, centerY - (Math.sqrt(3) / 2) * triangleSize / 3);
+                var areaA = calculateTriangleArea(centerX + triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize, randomPoint.x, randomPoint.y, centerX - triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize);
+                var areaB = calculateTriangleArea(centerX, centerY - (Math.sqrt(3) / 2) * triangleSize / 3, randomPoint.x, randomPoint.y, centerX + triangleSize / 2, centerY + (Math.sqrt(3) / 6) * triangleSize);
+
+                var percentC = (areaC / totalArea) * 100;
+                var percentA = (areaA / totalArea) * 100;
+                var percentB = (areaB / totalArea) * 100;
+
+                document.getElementById("areaC").textContent = "Área del triángulo C: " + percentC.toFixed(2) + "% del área total";
+                document.getElementById("areaA").textContent = "Área del triángulo A: " + percentA.toFixed(2) + "% del área total";
+                document.getElementById("areaB").textContent = "Área del triángulo B: " + percentB.toFixed(2) + "% del área total";
+
+                contadorC += percentC;
+                contadorA += percentA;
+                contadorB += percentB;
+
+                document.getElementById("contadorC").textContent = contadorC.toFixed(2);
+                document.getElementById("contadorA").textContent = contadorA.toFixed(2);
+                document.getElementById("contadorB").textContent = contadorB.toFixed(2);
+
+                contadorVeces++;
+                document.getElementById("contadorVeces").textContent = contadorVeces;
+
+                contadorSuma = contadorA + contadorB + contadorC;
+                document.getElementById("contadorSuma").textContent = contadorSuma.toFixed(2);
+            });
+        });
+    </script>
+</body>
+</html>
